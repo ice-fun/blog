@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.user.mapper.ParentLiveMapper">
+
+    <select id="getLiveByChildId" resultType="com.cqyz.aibeijiayuan.bean.live.vo.LiveVO">
+        select * from abjy_tb_live
+        where is_delete = 0
+        and JSON_CONTAINS(child_ids, #{childId})
+        and live_status in (1,2,3)
+    </select>
+</mapper>

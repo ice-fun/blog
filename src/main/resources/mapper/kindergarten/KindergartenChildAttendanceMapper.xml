@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.kindergarten.mapper.KindergartenChildAttendanceMapper">
+
+    <select id="getTodayCount" resultType="java.lang.Integer">
+        select count(*) from abjy_tb_child_attendance where child_id = #{childId} and date_format(record_time,'%Y-%m-%d') = #{dateStr}
+    </select>
+
+    <select id="getListByMonth" resultType="com.cqyz.aibeijiayuan.bean.attendance.vo.ChildAttendanceVO">
+        select *,date_format(record_time,'%Y-%m-%d') as `day`
+        from abjy_tb_child_attendance
+        where is_delete = 0
+        and (ask_for_leave_status is null or ask_for_leave_status in (2,4) or is_edit = 1)
+        and kindergarten_id = #{kindergartenId}
+        and classes_id = #{classesId}
+        and date_format(record_time,'%Y-%m') = #{month}
+    </select>
+    <select id="getAskForLeavePending" resultType="com.cqyz.aibeijiayuan.bean.attendance.vo.ChildAttendanceVO">
+        select * from abjy_tb_child_attendance where child_id = #{childId} and record_type = 3 and ask_for_leave_status = 2 and is_delete = 0
+    </select>
+    <select id="getByDay" resultType="com.cqyz.aibeijiayuan.bean.attendance.po.ChildAttendance">
+        select * from abjy_tb_child_attendance where is_delete = 0 and date_format(record_time,'%Y-%m-%d') = #{from} and child_id = #{childId} and is_edit = 1
+    </select>
+</mapper>

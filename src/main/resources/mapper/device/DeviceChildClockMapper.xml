@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.device.mapper.DeviceChildClockMapper">
+
+    <select id="getClock" resultType="com.cqyz.aibeijiayuan.bean.clock.vo.ChildClockVO">
+        select * from (SELECT clock_id,1 as `type`  FROM abjy_tb_child_clock where is_delete = 0
+        union
+        select clock_id, 2 as `type`  from abjy_tb_teacher_clock where is_delete = 0
+        )a
+        where a.clock_id = #{clockId}
+
+    </select>
+    <select id="getClockByMsAndId" resultType="com.cqyz.aibeijiayuan.bean.clock.po.ChildClock">
+        SELECT * from abjy_tb_child_clock
+        where is_delete = 0
+        and child_id = #{childId} and clock_millisecond = #{clockMillisecond}
+        limit 1
+    </select>
+</mapper>

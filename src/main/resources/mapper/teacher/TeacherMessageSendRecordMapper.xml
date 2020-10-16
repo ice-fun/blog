@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.customer.mapper.TeacherMessageSendRecordMapper">
+
+    <resultMap id="MessageSendRecordVO" type="com.cqyz.aibeijiayuan.bean.message.vo.MessageSendRecordVO">
+        <result column="target_phone" property="targetPhone" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+    </resultMap>
+    <select id="getSendRecord" resultMap="MessageSendRecordVO">
+        select msr.*,th.teacher_name
+        from abjy_tb_message_send_record msr , abjy_tb_teacher th
+        where msr.teacher_id = th.teacher_id
+        and msr.is_delete = 0
+        and msr.kindergarten_id = #{kindergartenId}
+    </select>
+</mapper>

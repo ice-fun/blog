@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.admin.mapper.AdminTeacherMapper">
+
+
+    <resultMap id="TeacherVO" type="com.knowswift.myspringboot.bean.customer.vo.CustomerVO">
+        <result column="classes_name_list" property="classesNameList" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+    </resultMap>
+
+    <select id="getList" resultMap="TeacherVO">
+        select * from (select th.*,concat('[',concat(if(cl.classes_id is not null,
+        GROUP_CONCAT(json_object('gradeName',gr.grade_name,'className',cl.classes_name)),''),']')) as classes_name_list,
+        GROUP_CONCAT(cl.classes_id) as classes_ids,
+        ca.card_external_code,ca.card_status,kg.kindergarten_name from (abjy_tb_teacher th,abjy_tb_kindergarten kg)
+        left join (abjy_tb_classes cl,abjy_tb_teacher_classes tl,abjy_tb_grade gr)
+        on th.teacher_id = tl.teacher_id and tl.classes_id = cl.classes_id and tl.is_delete = 0 and cl.is_delete = 0 and
+        gr.grade_id = cl.grade_id and cl.is_graduate = 0 and gr.is_delete = 0
+        left join abjy_tb_card ca on ca.card_id = th.card_id and ca.card_status in (3,4)
+        where th.is_delete = 0
+        and th.kindergarten_id = kg.kindergarten_id
+        <if test="kindergartenName!=null and kindergartenName !=''">
+            and kg.kindergarten_name like concat('%',concat(#{kindergartenName},'%'))
+        </if>
+        group by th.teacher_id
+        order by th.create_time)a
+        where a.is_delete = 0
+        <if test="teacherName!=null and teacherName !=''">
+            and a.teacher_name like concat('%',concat(#{teacherName},'%'))
+        </if>
+        <if test="teacherPhone!=null and teacherPhone !=''">
+            and a.teacher_phone like concat('%',concat(#{teacherPhone},'%'))
+        </if>
+        order by a.kindergarten_id
+    </select>
+</mapper>

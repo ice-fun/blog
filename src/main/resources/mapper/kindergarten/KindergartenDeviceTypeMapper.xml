@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.kindergarten.mapper.KindergartenDeviceBannerMapper">
+
+    <resultMap id="DeviceBannerVO" type="com.cqyz.aibeijiayuan.bean.device.vo.DeviceBannerVO">
+        <result column="device_banner_content" property="deviceBannerContent" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+    </resultMap>
+
+    <select id="getList" resultType="com.cqyz.aibeijiayuan.bean.device.vo.DeviceBannerVO">
+        select db.device_banner_id, db.device_type_id, db.kindergarten_id, db.device_banner_content ,
+        dt.device_type_id,dt.device_type_name
+        from abjy_tb_device_banner db, abjy_tb_device_type dt
+        where db.is_delete = 0 and dt.is_delete = 0
+        and db.device_type_id = dt.device_type_id
+        and db.kindergarten_id = #{kindergartenId}
+    </select>
+</mapper>

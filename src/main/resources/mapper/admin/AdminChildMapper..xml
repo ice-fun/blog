@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.admin.mapper.AdminChildMapper">
+
+    <resultMap id="ChildVo" type="com.cqyz.aibeijiayuan.bean.child.vo.ChildVO">
+        <result column="other_contact" property="otherContact" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+    </resultMap>
+
+    <select id="getList" resultMap="ChildVo">
+        select * from (select a.*, concat('[',if(cc2.child_contact_id is not
+        null,group_concat(json_object('relationName',cc2.relation_name,'isLogin',pa2.is_login,
+        'parentPhone',pa2.parent_phone)),''),']') as
+        other_contact
+        from (select ch.*, cl.classes_name ,gd.grade_name,kg.kindergarten_name, pa.is_login
+        from (abjy_tb_child ch, abjy_tb_classes cl, abjy_tb_grade gd,abjy_tb_parent pa,abjy_tb_kindergarten kg)
+        where ch.is_delete = 0
+        and ch.kindergarten_id = kg.kindergarten_id
+        and ch.classes_id = cl.classes_id
+        and gd.grade_id = cl.grade_id
+        and gd.is_delete = 0
+        and ch.parent_id = pa.parent_id
+        <if test="childName!=null and childName != '' ">
+            and ch.child_name like CONCAT('%',CONCAT(#{childName},'%'))
+        </if>
+        <if test="kindergartenName != null and kindergartenName != ''">
+            and kg.kindergarten_name like CONCAT('%',CONCAT(#{kindergartenName},'%'))
+        </if>
+        group by ch.child_id
+        order by ch.create_time desc) a
+        left join (abjy_tb_child_contact cc2,abjy_tb_parent pa2)
+        on cc2.child_id = a.child_id and cc2.parent_id = pa2.parent_id
+        and cc2.is_delete = 0
+        group by a.child_id
+        order by a.create_time desc)b
+        where b.is_delete = 0
+        <if test="phone != null and phone != '' ">
+            and( b.parent_phone like CONCAT('%',CONCAT(#{phone},'%'))
+            or b.other_contact like CONCAT('%',CONCAT(#{phone},'%')))
+        </if>
+        order by b.kindergarten_id desc
+    </select>
+</mapper>

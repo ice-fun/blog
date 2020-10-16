@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.admin.mapper.AdminCardMapper">
+
+    <select id="getList" resultType="com.cqyz.aibeijiayuan.bean.card.vo.CardVO">
+        select c.*,k.kindergarten_name , ag.agent_name from abjy_tb_card c left JOIN abjy_tb_kindergarten k on
+        c.kindergarten_id =
+        k.kindergarten_id
+        left join abjy_tb_agent ag on ag.agent_id = c.agent_id
+        where c.is_delete = 0
+        <if test="cardInternalCode != null and cardInternalCode != '' ">
+            and c.card_internal_code like CONCAT('%',CONCAT(#{cardInternalCode},'%'))
+        </if>
+        <if test="cardExternalCode != null and cardExternalCode != '' ">
+            and c.card_external_code like CONCAT('%',CONCAT(#{cardExternalCode},'%'))
+        </if>
+        <if test="kindergartenId != null and kindergartenId != '' ">
+            and c.kindergarten_id = #{kindergartenId}
+        </if>
+        <if test="fromTime != null and fromTime != ''">
+            and c.create_time >= #{fromTime}
+        </if>
+        <if test="toTime != null and toTime != ''">
+            and c.create_time &lt;= #{toTime}
+        </if>
+        order by c.create_time desc
+    </select>
+
+</mapper>

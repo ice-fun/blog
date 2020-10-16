@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.admin.mapper.AdminKindergartenMapper">
+
+    <select id="getKindergartenList" resultType="com.cqyz.aibeijiayuan.bean.kindergarten.vo.KindergartenVO">
+        select kg.*,ag.agent_name from abjy_tb_kindergarten kg left join abjy_tb_agent ag on ag.agent_id = kg.agent_id
+        where kg.is_delete = 0
+        <if test="keyword != null and keyword != '' ">
+            and kg.kindergarten_name like CONCAT('%',CONCAT(#{keyword},'%'))
+        </if>
+        <if test="kindergartenStatus != null and kindergartenStatus!=0">
+            and kg.kindergarten_status = #{kindergartenStatus}
+        </if>
+        order by kg.create_time desc
+    </select>
+
+</mapper>

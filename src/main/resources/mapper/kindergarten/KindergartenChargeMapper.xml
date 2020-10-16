@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.kindergarten.mapper.KindergartenChargeMapper">
+
+    <resultMap id="ChargeVO" type="com.cqyz.aibeijiayuan.bean.charge.vo.ChargeVO">
+        <result column="target_classes" property="targetClasses"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+        <result column="charge_project" property="chargeProject"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+    </resultMap>
+
+    <select id="getList" resultMap="ChargeVO">
+        select * from (SELECT charge_id, kindergarten_id, teacher_name, charge_name, charge_total_amount,charge_project,
+        charge_remark,
+        create_time,GROUP_CONCAT(t2.classes_name) as classes_name
+        ,no_pay,total_child,total_amount,accept_total,no_accept_total
+        from (select cg.*,sum(if(co.pay_status=1,1,0)) as no_pay, count(co.charge_order_id) as
+        total_child,cg.charge_total_amount*count(co.charge_order_id) as
+        total_amount,sum(if(co.pay_status=2,1,0))*cg.charge_total_amount as accept_total
+        ,sum(if(co.pay_status=1,1,0))*cg.charge_total_amount as no_accept_total
+        from abjy_tb_charge cg, abjy_tb_charge_order co, abjy_tb_child ch
+        where cg.is_delete = 0 and co.is_delete = 0 and ch.is_delete = 0
+        and cg.kindergarten_id = #{kindergartenId}
+        and co.charge_id = cg.charge_id and ch.child_id = co.child_id
+        <if test="childName!=null and childName !=''">
+            and ch.child_name like concat('%',concat(#{childName},'%'))
+        </if>
+        GROUP BY cg.charge_id)t1,
+        (select cl.classes_id,concat(ga.grade_name ,cl.classes_name) as classes_name
+        from abjy_tb_classes cl ,abjy_tb_grade ga
+        WHERE cl.grade_id = ga.grade_id and cl.is_delete = 0 and ga.is_delete = 0)t2
+        WHERE JSON_CONTAINS(t1.target_classes, concat('"',concat(t2.classes_id,'"')))
+        GROUP BY t1.charge_id)t3
+        where charge_id is not null
+        <if test="chargeName!=null and chargeName !=''">
+            and charge_name like concat('%',concat(#{chargeName},'%'))
+        </if>
+        <if test="classesName!=null and classesName !=''">
+            and classes_name like concat('%',concat(#{classesName},'%'))
+        </if>
+        <if test="fromTime!=null and fromTime !=''">
+            and create_time > #{fromTime}
+        </if>
+        <if test="toTime!=null and toTime !=''">
+            and create_time &lt; #{toTime}
+        </if>
+        <if test="status == 1">
+            and no_pay > 0
+        </if>
+        <if test="status == 2">
+            and no_pay = 0
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="getArrearsList" resultMap="ChargeVO">
+        select cg.charge_id,cg.charge_name, co.charge_order_id,ch.child_id
+        ,ch.child_name,cg.charge_remark,cg.charge_project,cg.charge_total_amount,
+        co.pay_status,concat(ga.grade_name,cl.classes_name) as classes_name,cg.create_time
+        from abjy_tb_charge cg , abjy_tb_charge_order co, abjy_tb_child ch ,abjy_tb_classes cl,abjy_tb_grade ga
+        where cg.charge_id = co.charge_id and co.child_id = ch.child_id and ch.classes_id = cl.classes_id and
+        cl.grade_id = ga.grade_id and ga.is_delete = 0
+        and cg.is_delete = 0 and co.is_delete = 0 and ch.is_delete = 0 and cl.is_delete = 0 and ga.is_delete = 0
+        and co.pay_status = 1
+        and cg.kindergarten_id = #{kindergartenId}
+        <if test="chargeName!=null and chargeName !=''">
+            and cg.charge_name like concat('%',concat(#{chargeName},'%'))
+        </if>
+        <if test="classesName!=null and classesName !=''">
+            and concat(ga.grade_name,cl.classes_name) like concat('%',concat(#{classesName},'%'))
+        </if>
+        <if test="childName!=null and childName !=''">
+            and ch.child_name like concat('%',concat(#{childName},'%'))
+        </if>
+        <if test="fromTime!=null and fromTime !=''">
+            and cg.create_time > #{fromTime}
+        </if>
+        <if test="toTime!=null and toTime !=''">
+            and cg.create_time &lt; #{toTime}
+        </if>
+        ORDER BY cg.create_time desc
+    </select>
+    <select id="getArrearsData" resultType="com.cqyz.aibeijiayuan.bean.charge.vo.ChargeVO">
+        SELECT count(*) as arrears_count,ifnull(sum(arrears_total_amount),0) as arrears_total_amount
+        from (
+        select count(*) as arrears_count, ifnull(sum(cg.charge_total_amount),0) as arrears_total_amount
+        from abjy_tb_charge cg , abjy_tb_charge_order co, abjy_tb_child ch ,abjy_tb_classes cl,abjy_tb_grade ga
+        where cg.charge_id = co.charge_id and co.child_id = ch.child_id and ch.classes_id = cl.classes_id and
+        cl.grade_id = ga.grade_id
+        and cg.is_delete = 0 and co.is_delete = 0 and ch.is_delete = 0 and cl.is_delete = 0 and ga.is_delete = 0
+        and co.pay_status = 1
+        and cg.kindergarten_id = #{kindergartenId}
+        <if test="chargeName!=null and chargeName !=''">
+            and cg.charge_name like concat('%',concat(#{chargeName},'%'))
+        </if>
+        <if test="classesName!=null and classesName !=''">
+            and concat(ga.grade_name,cl.classes_name) like concat('%',concat(#{classesName},'%'))
+        </if>
+        <if test="childName!=null and childName !=''">
+            and ch.child_name like concat('%',concat(#{childName},'%'))
+        </if>
+        <if test="fromTime!=null and fromTime !=''">
+            and cg.create_time > #{fromTime}
+        </if>
+        <if test="toTime!=null and toTime !=''">
+            and cg.create_time &lt; #{toTime}
+        </if>
+        GROUP BY ch.child_id)t1
+    </select>
+    <select id="getChargeByChargeOrderId" resultType="com.cqyz.aibeijiayuan.bean.charge.vo.ChargeVO">
+        select cg.charge_name, cg.charge_total_amount, ch.child_name,ch.child_id
+        from abjy_tb_charge cg , abjy_tb_charge_order co, abjy_tb_child ch
+        where cg.charge_id = co.charge_id and co.child_id = ch.child_id and co.charge_order_id = #{id}
+    </select>
+    <select id="getArrearsAll" resultType="com.cqyz.aibeijiayuan.bean.charge.vo.ChargeVO">
+        select cg.charge_id,cg.charge_name, co.charge_order_id,ch.child_id ,ch.child_name,cg.charge_remark,cg.charge_project,cg.charge_total_amount,
+        co.pay_status,concat(ga.grade_name,cl.classes_name) as classes_name
+        from abjy_tb_charge cg , abjy_tb_charge_order co, abjy_tb_child ch ,abjy_tb_classes cl,abjy_tb_grade ga
+        where cg.charge_id = co.charge_id and co.child_id = ch.child_id and ch.classes_id = cl.classes_id and cl.grade_id = ga.grade_id
+        and cg.is_delete = 0 and co.is_delete = 0 and ch.is_delete = 0 and cl.is_delete = 0 and ga.is_delete = 0
+        and co.pay_status = 1
+    </select>
+</mapper>

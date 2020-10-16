@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.kindergarten.mapper.KindergartenAttendanceDateMapper">
+
+
+    <select id="getAttendanceDateByYearMonth" resultType="com.cqyz.aibeijiayuan.bean.attendance.vo.AttendanceDateVO">
+        select
+        attendance_date_id,
+        DATE_FORMAT(attendance_date_date,"%d") as 'attendance_date_day',
+        attendance_date_status,
+        attendance_date_day_of_week
+        from abjy_tb_attendance_date
+        where DATE_FORMAT(attendance_date_date,"%Y-%m") = #{yearMonth}
+        and kindergarten_id = #{kindergartenId};
+    </select>
+    <select id="getSchoolDayAndHolidayCount" resultType="java.util.Map">
+        SELECT
+        count( IF ( attendance_date_status = 1, TRUE, NULL )) as 'schoolDay',
+        count( IF ( attendance_date_status = 2, TRUE, NULL )) as 'holiday'
+        FROM
+        abjy_tb_attendance_date
+        WHERE
+        DATE_FORMAT( attendance_date_date, "%Y-%m" ) = #{yearMonth}
+        AND kindergarten_id = #{kindergartenId}
+        AND attendance_date_date &lt; NOW()
+    </select>
+
+    <select id="getByMonth" resultType="com.cqyz.aibeijiayuan.bean.attendance.vo.AttendanceDateVO">
+        select attendance_date_id, attendance_date_date, attendance_date_day_of_week, attendance_date_status
+        from abjy_tb_attendance_date
+        where is_delete = 0
+        and date_format(attendance_date_date,'%Y-%m') = #{month}
+        and kindergarten_id = #{kindergartenId}
+        and attendance_date_type = #{type}
+        order by attendance_date_date
+    </select>
+</mapper>

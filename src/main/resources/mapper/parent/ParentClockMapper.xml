@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.user.mapper.ParentClockMapper">
+
+    <select id="getChildClockList" resultType="com.cqyz.aibeijiayuan.bean.clock.vo.ChildClockVO">
+        select t2.child_name,t2.clock_time,t2.clock_picture,ifnull(t2.card_external_code ,card.card_external_code) as card_external_code
+        FROM (select t1.child_id,t1.child_name,ca.clock_time,ca.clock_picture,cd.card_external_code
+            from (select * from abjy_tb_child where is_delete = 0 and parent_id = #{parentId} AND child_status in (1,2)
+        union
+        select ch.* from abjy_tb_child ch ,abjy_tb_child_contact cc where ch.is_delete = 0  AND ch.child_status in (1,2)
+        and cc.is_delete = 0
+        and ch.child_id = cc.child_id and cc.parent_id = #{parentId}) t1 left join (abjy_tb_child_clock ca,abjy_tb_card cd)
+        on ca.child_id = t1.child_id and ca.is_delete = 0 and ca.card_internal_code = cd.card_internal_code
+        and cd.is_delete = 0
+        and date_format(ca.clock_time,'%Y-%m-%d') = #{day}
+        order by ca.clock_millisecond desc) t2 left join (select * from abjy_tb_card where is_delete = 0 and card_status in(3,4) group by user_id)card on t2.child_id = card.user_id and t2.clock_time is null
+        order by t2.clock_time desc
+    </select>
+</mapper>

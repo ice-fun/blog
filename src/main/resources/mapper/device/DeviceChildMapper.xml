@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.device.mapper.DeviceChildMapper">
+
+    <select id="listUser" resultType="com.cqyz.aibeijiayuan.bean.common.UserVO">
+        SELECT ca.card_external_code,ca.card_internal_code,
+        ch.child_id as user_id,ch.child_name as user_name,ch.face_image_url,
+        1 as user_type, cl.classes_name ,ch.kindergarten_id ,kg.kindergarten_name,ch.update_type,gr.grade_name
+        FROM (abjy_tb_child ch,abjy_tb_classes cl , abjy_tb_kindergarten kg,abjy_tb_grade gr)
+        left join abjy_tb_card ca on ca.user_id = ch.child_id and ca.card_status = 3
+        where ch.is_delete = 0
+        and cl.classes_id = ch.classes_id and kg.kindergarten_id = ch.kindergarten_id and gr.grade_id = cl.grade_id
+        and gr.is_delete = 0
+        and kg.kindergarten_id = #{kindergartenId}
+        <if test="isAll!=null and isAll !=1">
+            and ch.update_type not like 0
+        </if>
+        union
+        select ca.card_external_code,ca.card_internal_code,
+        th.teacher_id, th.teacher_name, th.face_image_url,2 as user_type,
+        null,th.kindergarten_id,kg.kindergarten_name,th.update_type,null
+        from (abjy_tb_teacher th , abjy_tb_kindergarten kg)
+        left join abjy_tb_card ca on ca.card_id = th.card_id and ca.card_status = 3
+        where th.is_delete = 0 and th.teacher_status = 1 and th.kindergarten_id = kg.kindergarten_id
+        and kg.kindergarten_id = #{kindergartenId}
+        <if test="isAll!=null and isAll !=1">
+            and th.update_type not like 0
+        </if>
+        union
+        select null,null,
+        a.parent_id , a.parent_name, a.face_image_url,3 as user_type,
+        null,null,null,0,null from (select pa.*
+        from abjy_tb_parent pa, abjy_tb_child ch
+        where ch.is_delete = 0 and pa.parent_id = ch.parent_id and ch.child_status = 1 and pa.is_delete = 0
+        and ch.kindergarten_id = #{kindergartenId}
+        union
+        select pa.* from abjy_tb_parent pa, abjy_tb_child ch,abjy_tb_child_contact cc
+        where ch.is_delete = 0 and cc.parent_id = ch.parent_id and ch.child_status = 1 and pa.is_delete = 0
+        and ch.kindergarten_id = #{kindergartenId}
+        and cc.is_delete = 0 and cc.child_id = ch.child_id)a
+        group by a.parent_id
+    </select>
+    <select id="getByUserId" resultType="com.cqyz.aibeijiayuan.bean.common.UserVO">
+        select * from (
+        SELECT ca.card_external_code,ca.card_internal_code,
+        ch.child_id as user_id,ch.child_name as user_name,ch.face_image_url,
+        1 as user_type, cl.classes_id , cl.classes_name ,ch.kindergarten_id ,kg.kindergarten_name,ch.update_type,gr.grade_name
+        FROM (abjy_tb_child ch,abjy_tb_classes cl , abjy_tb_kindergarten kg,abjy_tb_grade gr)
+        left join abjy_tb_card ca on ca.user_id = ch.child_id and ca.card_status = 3
+        where ch.is_delete = 0
+        and cl.classes_id = ch.classes_id and kg.kindergarten_id = ch.kindergarten_id and gr.grade_id = cl.grade_id
+        and gr.is_delete = 0
+        and ch.child_id = #{userId}
+        union
+        select ca.card_external_code,ca.card_internal_code,
+        th.teacher_id, th.teacher_name, th.face_image_url,2 as user_type,null,
+        null,th.kindergarten_id,kg.kindergarten_name,th.update_type,null
+        from (abjy_tb_teacher th , abjy_tb_kindergarten kg)
+        left join abjy_tb_card ca on ca.card_id = th.card_id and ca.card_status = 3
+        where th.is_delete = 0 and th.teacher_status = 1 and th.kindergarten_id = kg.kindergarten_id
+        and th.teacher_id = #{userId}
+        )a
+        where a.user_id = #{userId}
+        group by a.user_id
+    </select>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.customer.mapper.TeacherChargeMapper">
+
+    <resultMap id="ChargeVO" type="com.cqyz.aibeijiayuan.bean.charge.vo.ChargeVO">
+        <result column="charge_project" property="chargeProject" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+        <result column="target_classes" property="targetClasses"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+    </resultMap>
+
+    <resultMap id="ChargeOrderVO" type="com.cqyz.aibeijiayuan.bean.charge.vo.ChargeOrderVO">
+        <result column="charge_project" property="chargeProject" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+    </resultMap>
+
+    <select id="getListByTeacher" resultMap="ChargeVO">
+        select cg.charge_id, cg.kindergarten_id, cg.teacher_name,
+        cg.charge_name, cg.charge_total_amount, cg.charge_remark,cg.charge_project, cg.target_classes, cg.create_time
+        ,co.no_pay,co.paid
+        from abjy_tb_charge cg,abjy_tb_teacher_classes tc,
+        (select charge_id, sum(if(pay_status=1,1,0)) as no_pay, sum(if(pay_status=2,1,0)) as paid from abjy_tb_charge_order
+            where is_delete = 0 group by charge_id) co
+        where cg.is_delete = 0  and co.charge_id = cg.charge_id
+        and json_contains(cg.target_classes,concat('"',concat(tc.classes_id,'"')))
+        and cg.kindergarten_id = #{kindergartenId}
+        and tc.teacher_id = #{teacherId}
+        group by cg.charge_id
+        order by cg.create_time desc
+    </select>
+
+    <select id="getList" resultMap="ChargeVO">
+        select  cg.charge_id, cg.kindergarten_id, cg.teacher_name, cg.charge_name, cg.charge_total_amount,
+        cg.charge_project, cg.charge_remark, cg.target_classes, cg.create_time,co.no_pay,co.paid
+        from abjy_tb_charge cg,(select charge_id, sum(if(pay_status=1,1,0)) as no_pay, sum(if(pay_status=2,1,0)) as paid
+			from abjy_tb_charge_order where is_delete = 0 group by charge_id) co
+		where cg.is_delete = 0 and co.charge_id = cg.charge_id
+        and cg.kindergarten_id = #{kindergartenId}
+        order by cg.create_time desc
+    </select>
+
+    <select id="getArrearsList" resultType="com.cqyz.aibeijiayuan.bean.charge.vo.ChargeVO">
+        select cg.charge_id,cg.charge_name, co.charge_order_id,ch.child_id
+        ,ch.child_name,cg.charge_remark,cg.charge_project,cg.charge_total_amount,
+        co.pay_status,concat(ga.grade_name,cl.classes_name) as classes_name,cg.create_time
+        from abjy_tb_charge cg , abjy_tb_charge_order co, abjy_tb_child ch ,abjy_tb_classes cl,abjy_tb_grade
+        ga,abjy_tb_teacher_classes tc
+        where cg.charge_id = co.charge_id and co.child_id = ch.child_id and ch.classes_id = cl.classes_id
+        and cl.grade_id = ga.grade_id
+        and tc.classes_id = cl.classes_id
+        <if test="teacherId !=null and teacherId != ''">
+            and tc.teacher_id = #{teacherId}
+        </if>
+        and tc.is_delete = 0
+        and cg.is_delete = 0 and co.is_delete = 0 and ch.is_delete = 0 and cl.is_delete = 0 and ga.is_delete = 0
+        and co.pay_status = 1
+        and cg.kindergarten_id = #{kindergartenId}
+        <if test="classesId !=null and classesId != ''">
+            and co.classes_id = #{classesId}
+        </if>
+        ORDER BY cg.create_time desc
+    </select>
+
+    <select id="getArrearsData" resultType="com.cqyz.aibeijiayuan.bean.charge.vo.ChargeVO">
+        SELECT count(*) as arrears_count,ifnull(sum(arrears_total_amount),0) as arrears_total_amount
+        from (
+        select count(*) as arrears_count, ifnull(sum(cg.charge_total_amount),0) as arrears_total_amount
+        from abjy_tb_charge cg , abjy_tb_charge_order co, abjy_tb_child ch ,abjy_tb_classes cl,abjy_tb_grade
+        ga,abjy_tb_teacher_classes tc
+        where cg.charge_id = co.charge_id and co.child_id = ch.child_id and ch.classes_id = cl.classes_id
+        and cl.grade_id = ga.grade_id
+        and tc.classes_id = cl.classes_id
+        <if test="teacherId !=null and teacherId != ''">
+            and tc.teacher_id = #{teacherId}
+        </if>
+        and tc.is_delete = 0
+        and cg.is_delete = 0 and co.is_delete = 0 and ch.is_delete = 0 and cl.is_delete = 0 and ga.is_delete = 0
+        and co.pay_status = 1
+        and cg.kindergarten_id = #{kindergartenId}
+        <if test="classesId!=null and classesId !=''">
+            and co.classes_id like concat('%',concat(#{classesId},'%'))
+        </if>
+        GROUP BY ch.child_id)t1
+    </select>
+</mapper>

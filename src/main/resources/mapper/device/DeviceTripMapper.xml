@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.device.mapper.DeviceTripMapper">
+
+    <select id="getByIdOrDevice" resultType="com.cqyz.aibeijiayuan.bean.trip.vo.TripVO">
+        SELECT tr.*,kg.kindergarten_name FROM aibei2.abjy_tb_trip tr, abjy_tb_device de,abjy_tb_kindergarten kg
+        where de.device_id = tr.device_id and tr.trip_type !=4 and kg.kindergarten_id = de.kindergarten_id
+        <if test="tripId != null and tripId != '' ">
+            and tr.trip_id = #{tripId}
+        </if>
+        <if test="tripId ==null or tripId=='' ">
+            and de.device_mac_address = #{deviceMacAddress}
+        </if>
+    </select>
+</mapper>

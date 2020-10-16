@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.agent.mapper.AgentKindergartenMapper">
+
+    <!--    <select id="list" resultType="com.cqyz.aibeijiayuan.bean.kindergarten.vo.KindergartenVO">-->
+    <!--        select kindergarten_id, kindergarten_code, kindergarten_name, kindergarten_address,-->
+    <!--        kindergarten_manager_phone, create_time, kindergarten_status-->
+    <!--        from abjy_tb_kindergarten where is_delete = 0 and agent_id = #{agentId}-->
+    <!--        <if test="name !=null and name !=''">-->
+    <!--            and kindergarten_name like concat('%',#{name},'%')-->
+    <!--        </if>-->
+    <!--        <if test="code !=null and code !=''">-->
+    <!--            and kindergarten_code like concat('%',#{code},'%')-->
+    <!--        </if>-->
+    <!--        <if test="status !=null and status !=0 ">-->
+    <!--            and kindergarten_status = #{status}-->
+    <!--        </if>-->
+    <!--        order by create_time desc-->
+    <!--    </select>-->
+
+    <select id="list" resultType="com.cqyz.aibeijiayuan.bean.kindergarten.vo.KindergartenVO">
+        select t2.*,count(t3.child_id) as child_count from
+        (select kg.kindergarten_id,kg.kindergarten_name, kg.create_time,count(a.child_id) as login_count
+        from abjy_tb_kindergarten kg
+        left join (
+        select * from (
+        select ch.child_id,pa.is_login,ch.kindergarten_id
+        from abjy_tb_child ch, abjy_tb_parent pa
+        where ch.is_delete = 0
+        and ch.child_status = 1
+        and pa.is_delete = 0
+        and ch.parent_id = pa.parent_id
+        and pa.is_login = 1
+        union
+        select ch.child_id,pa.is_login,ch.kindergarten_id
+        from abjy_tb_child ch ,abjy_tb_child_contact cc,abjy_tb_parent pa
+        where ch.is_delete = 0
+        and pa.is_delete = 0 and pa.parent_id = cc.parent_id and cc.is_delete = 0 and ch.child_status = 1
+        and ch.child_id = cc.child_id and pa.is_login = 1
+        ) t1 group by child_id
+        ) a on  kg.kindergarten_id = a.kindergarten_id
+        where kg.is_delete = 0 and kg.kindergarten_status  and kg.agent_id = #{agentId}
+        group by kg.kindergarten_id) t2 left join abjy_tb_child t3 on t2.kindergarten_id = t3.kindergarten_id and t3.is_delete = 0 and t3.child_status = 1
+        group by t2.kindergarten_id
+    </select>
+    <select id="getActionCount" resultType="com.cqyz.aibeijiayuan.bean.kindergarten.vo.KindergartenVO">
+        select t2.*,count(t3.child_id) as child_count,ifnull(t6.login_parent_count,0) as login_parent_count,t7.* from
+        (select kg.kindergarten_id,kg.kindergarten_name, kg.create_time,count(a.child_id) as login_count
+        from abjy_tb_kindergarten kg
+        left join (
+        select * from (
+        select ch.child_id,pa.is_login,ch.kindergarten_id
+        from abjy_tb_child ch, abjy_tb_parent pa
+        where ch.is_delete = 0
+        and ch.child_status = 1
+        and pa.is_delete = 0
+        and ch.parent_id = pa.parent_id
+        and pa.is_login = 1
+        and ch.kindergarten_id = #{kindergartenId}
+        union
+        select ch.child_id,pa.is_login,ch.kindergarten_id
+        from abjy_tb_child ch ,abjy_tb_child_contact cc,abjy_tb_parent pa
+        where ch.is_delete = 0
+        and pa.is_delete = 0 and pa.parent_id = cc.parent_id and cc.is_delete = 0 and ch.child_status = 1
+        and ch.child_id = cc.child_id and pa.is_login = 1
+        and ch.kindergarten_id =  #{kindergartenId}
+        ) t1 group by child_id
+        ) a on  kg.kindergarten_id = a.kindergarten_id
+        where kg.is_delete = 0 and kg.kindergarten_status
+        and kg.kindergarten_id = #{kindergartenId}) t2
+        left join abjy_tb_child t3 on t2.kindergarten_id = t3.kindergarten_id and t3.is_delete = 0
+        and t3.child_status = 1 and t3.kindergarten_id =  #{kindergartenId}
+
+        left join (select count(*) as login_parent_count,kindergarten_id from (select * from(
+        select pa.parent_id,pa.is_login,ch.kindergarten_id
+        from abjy_tb_child ch, abjy_tb_parent pa
+        where ch.is_delete = 0
+        and ch.child_status = 1
+        and pa.is_delete = 0
+        and ch.parent_id = pa.parent_id
+        and pa.is_login = 1
+        and ch.kindergarten_id = #{kindergartenId}
+        union
+        select pa.parent_id,pa.is_login,ch.kindergarten_id
+        from abjy_tb_child ch ,abjy_tb_child_contact cc,abjy_tb_parent pa
+        where ch.is_delete = 0
+        and pa.is_delete = 0 and pa.parent_id = cc.parent_id and cc.is_delete = 0 and ch.child_status = 1
+        and ch.child_id = cc.child_id and pa.is_login = 1
+        and ch.kindergarten_id = #{kindergartenId}
+        )t5 group by parent_id)t7 group by kindergarten_id
+        )t6 on 1=1
+
+        left join(select count(*) as teacher_count , ifnull(sum(is_login=1),0)as login_teacher_count from abjy_tb_teacher
+        where teacher_status = 1 and is_delete = 0
+        and kindergarten_id = #{kindergartenId})t7 on 1=1
+
+    </select>
+</mapper>

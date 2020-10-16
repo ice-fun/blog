@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.knowswift.myspringboot.api.user.mapper.UserUserMapper">
+
+
+    <select id="getByPhone" resultType="com.knowswift.myspringboot.bean.user.po.User">
+        select * from abjy_tb_parent where is_delete = 0 and parent_phone = #{phone}
+    </select>
+
+    <select id="getChildAllParent" resultType="com.knowswift.myspringboot.bean.user.vo.UserVO">
+        select pa.*,ch.relation_id , ch.relation_name ,1 as first_contact from abjy_tb_child ch, abjy_tb_parent pa
+        where ch.is_delete = 0
+        and pa.is_delete = 0
+        and ch.parent_id = pa.parent_id
+        and ch.child_id = #{childId}
+        union
+        select pa.*,cc.relation_id, cc.relation_name ,0 as first_contact from abjy_tb_child ch ,abjy_tb_child_contact cc,abjy_tb_parent pa where ch.is_delete = 0
+        and pa.is_delete = 0 and pa.parent_id = cc.parent_id and cc.is_delete = 0
+        and ch.child_id = cc.child_id and cc.child_id = #{childId}
+    </select>
+</mapper>

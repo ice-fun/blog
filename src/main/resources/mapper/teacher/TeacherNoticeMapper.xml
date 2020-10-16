@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cqyz.aibeijiayuan.api.customer.mapper.TeacherNoticeMapper">
+
+    <resultMap id="NoticeVo" type="com.cqyz.aibeijiayuan.bean.notice.vo.NoticeVO">
+        <result column="notice_target_children" property="noticeTargetChildren" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+        <result column="notice_target" property="noticeTarget" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+        <result column="notice_picture" property="noticePicture" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+        <result column="vote_option" property="voteOption" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+        <result column="vote" property="vote" jdbcType="VARCHAR"
+                typeHandler="com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler"/>
+    </resultMap>
+    <update id="readNotice">
+        update abjy_tb_notice_log set is_read = 1 where notice_id = #{noticeId} and target_id = #{teacherId}
+    </update>
+
+    <select id="getNoticeByTeacherId" resultMap="NoticeVo">
+        select nt.*,th.teacher_name as send_name,concat('[',concat(group_concat(concat('"',concat(t1.child_name,'"'))),']')) as notice_target_children
+         from abjy_tb_notice nt , abjy_tb_teacher th
+        ,(
+        select child_id,child_name from abjy_tb_child ch where is_delete = 0 and child_status = 1
+        union
+        select teacher_id,teacher_name from abjy_tb_teacher th where is_delete = 0 and teacher_status = 1
+        ) t1
+         where nt.teacher_id = th.teacher_id
+        and nt.is_delete = 0 and json_contains(nt.notice_target,concat('"',concat(t1.child_id,'"')))
+        and nt.teacher_id = #{Id}
+        group by notice_id
+        order by nt.create_time desc
+
+    </select>
+
+    <select id="getNoticeReceive" resultMap="NoticeVo">
+        select *,
+        concat('[',concat(group_concat(concat('"',concat(t2.child_name,'"'))),']')) as notice_target_children
+        from (select n.*,nl.is_read,th.teacher_name as send_name,t1.child_name,t1.child_id,nl.notice_log_id,nl.vote,nl.join_status
+        from (abjy_tb_notice n, abjy_tb_notice_log nl, abjy_tb_teacher th) left join
+        (
+        select child_id,child_name from abjy_tb_child ch where is_delete = 0 and child_status = 1
+        union
+        select teacher_id,teacher_name from abjy_tb_teacher th where is_delete = 0 and teacher_status = 1
+        ) t1 on json_contains(n.notice_target,concat('"',concat(t1.child_id,'"')))
+        where n.is_delete = 0
+        and n.notice_id = nl.notice_id and nl.target_id = #{Id}
+        and n.teacher_id = th.teacher_id
+        group by notice_id, t1.child_id)t2
+        where json_contains(notice_target,concat('"',concat(#{Id},'"')))
+        group by notice_id  order by is_read , notice_time desc
+    </select>
+
+    <select id="getNoticeDetail" resultMap="NoticeVo">
+        select n.*,t.teacher_name,k.kindergarten_name,nl.join_status, nl.vote ,nl.notice_log_id
+        from (abjy_tb_notice n, abjy_tb_teacher t, abjy_tb_kindergarten k) left join abjy_tb_notice_log nl
+        on n.notice_id = nl.notice_id and nl.target_id = #{teacherId}
+        where n.teacher_id = t.teacher_id and t.kindergarten_id = k.kindergarten_id
+        and n.is_delete = 0 and n.notice_id = #{noticeId}
+    </select>
+
+    <select id="getNoticeListByRead" resultType="com.cqyz.aibeijiayuan.bean.notice.vo.NoticeLogVO">
+        select * from (
+        select teacher_id as user_id, teacher_name as username, teacher_phone as phone,
+        ifnull(teacher_avatar,'') as avatar
+        from abjy_tb_teacher where is_delete = 0 and teacher_status = 1
+        union
+        select child_id ,child_name, parent_phone,
+        ifnull(child_avatar,'') as avatar
+        from abjy_tb_child where is_delete = 0 and child_status = 1
+        ) a,
+        (
+        SELECT target_id FROM abjy_tb_notice_log WHERE is_delete = 0 AND notice_id = #{noticeId}
+        <if test="read ==0 ">
+            AND is_read = 0
+        </if>
+        <if test="read ==1 ">
+            AND is_read = 1
+        </if>
+        <if test="read ==2 ">
+            AND join_status = 3
+        </if>
+        <if test="read ==3 ">
+            AND vote is null
+        </if>
+        GROUP BY target_id ) b
+        where a.user_id = b.target_id
+
+    </select>
+    <select id="getNoticeNeedSms" resultType="com.cqyz.aibeijiayuan.bean.notice.vo.NoticeVO">
+        SELECT nt.*,kg.kindergarten_name FROM abjy_tb_notice nt, abjy_tb_kindergarten kg where nt.is_delete = 0
+        and kg.is_delete = 0 and kg.kindergarten_id = nt.kindergarten_id
+        and TIMESTAMPDIFF(minute,nt.notice_time,NOW()) > nt.sms_minute and nt.sms_minute > 0 and nt.is_sms = 0
+    </select>
+    <select id="getNeedSmsUser" resultType="com.cqyz.aibeijiayuan.bean.notice.vo.NoticeLogVO">
+        select a.phone,a.username, b.notice_log_id from (
+        select teacher_id as user_id, teacher_phone as phone,teacher_name as username
+        from abjy_tb_teacher where is_delete = 0  and teacher_status = 1
+        union
+        select child_id , parent_phone ,concat(child_name,relation_name) as username
+        from abjy_tb_child where is_delete = 0  and child_status = 1
+        union
+        select ch.child_id, pa.parent_phone ,pa.parent_name as username
+        from abjy_tb_child ch , abjy_tb_parent pa, abjy_tb_child_contact cc
+        where ch.is_delete = 0  and ch.child_status = 1
+        and cc.is_delete = 0 and ch.child_id = cc.child_id and cc.parent_id = pa.parent_id and pa.is_delete = 0
+        ) a,
+        (select lg.target_id ,lg.notice_log_id from
+         abjy_tb_notice_log lg WHERE lg.is_delete = 0 AND lg.notice_id = #{noticeId} AND is_read = 0
+         and lg.target_id not in (
+        SELECT target_id FROM abjy_tb_notice_log WHERE is_delete = 0 AND notice_id = #{noticeId} AND is_read = 1
+        GROUP BY target_id )
+         )b
+        where a.user_id = b.target_id
+        GROUP BY a.phone
+    </select>
+</mapper>
