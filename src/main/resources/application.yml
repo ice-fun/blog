@@ -28,7 +28,7 @@ server:
   servlet:
     context-path: /blog
 mybatis-plus:
-  type-aliases-package: com.knowswift.myspringboot.bean.*
+  type-aliases-package: com.blog.blog.bean.*
   global-config:
     db-config:
       id-type: id_worker_str
