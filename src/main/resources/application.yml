@@ -36,7 +36,7 @@ mybatis-plus:
       logic-delete-field: isDelete
       logic-delete-value: 1
       logic-not-delete-value: 0
-      table-prefix: test_tb_
+      table-prefix: blog_tb_
       table-underline: true
   configuration:
     map-underscore-to-camel-case: true
