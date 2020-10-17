@@ -28,8 +28,7 @@ public class AdminVO {
     private String adminPassword;
     private String kindergartenId;
     private String role;
-    private Integer adminTokenVersion;
-    private Integer kindergartenTokenVersion;
+    private Integer tokenVersion;
     private Integer isLock;
     @TableField(value = "is_delete", fill = FieldFill.INSERT)
     private Integer isDelete;

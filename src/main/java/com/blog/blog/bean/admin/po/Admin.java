@@ -38,8 +38,7 @@ public class Admin implements AuthUserDetails {
      应该为每个程序都设置一个tokenVersion属性，
      便于同时在多个程序登录
      */
-    private Integer adminTokenVersion;
-    private Integer userTokenVersion;
+    private Integer tokenVersion;
     private Integer isLock;
     @TableField(value = "is_delete", fill = FieldFill.INSERT)
     private Integer isDelete;
@@ -98,8 +97,7 @@ public class Admin implements AuthUserDetails {
     @Override
     public Map<String, Integer> getTokenVersionMap() {
         HashMap<String, Integer> map = new HashMap<>();
-        map.put("adminTokenVersion", adminTokenVersion);
-        map.put("userTokenVersion", userTokenVersion);
+        map.put("adminTokenVersion", tokenVersion);
         return map;
     }
 

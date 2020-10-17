@@ -28,10 +28,10 @@ public class AdminPasswordLoginSuccessHandler extends AbstractLoginSuccessHandle
             sendResponse(httpServletResponse, BaseResponse.NO_ACCESS, "无权访问", null);
             return null;
         }
-        admin.setAdminTokenVersion(admin.getAdminTokenVersion() + 1);
+        admin.setTokenVersion(admin.getTokenVersion() + 1);
         adminAdminService.updateById(admin);
         Map<String, Object> claims = new HashMap<>();
-        claims.put("tokenVersion", admin.getAdminTokenVersion());
+        claims.put("tokenVersion", admin.getTokenVersion());
         String token = JwtTokenUtils.generateToken(claims, admin.getUsername());
         Map<String, Object> data = new HashMap<>();
         data.put("adminId", admin.getAdminId());

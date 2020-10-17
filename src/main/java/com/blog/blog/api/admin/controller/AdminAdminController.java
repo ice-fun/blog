@@ -31,7 +31,7 @@ public class AdminAdminController extends AdminBaseController {
         String token = jwtAuthenticationToken.getToken();
         if (JwtTokenUtils.isTokenAlmostExpired(jwtAuthenticationToken.getToken())) {
             Map<String, Object> claims = new HashMap<>();
-            claims.put("tokenVersion", admin.getAdminTokenVersion());
+            claims.put("tokenVersion", admin.getTokenVersion());
             token = JwtTokenUtils.generateToken(claims, admin.getAdminAccount());
         }
         Map<String, Object> map = new HashMap<>();
