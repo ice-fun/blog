@@ -6,6 +6,7 @@ import com.blog.blog.bean.user.po.User;
 import com.blog.blog.bean.user.vo.UserVO;
 import com.blog.blog.utils.WrappedBeanCopier;
 import com.blog.blog.annotation.EnableLog;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 全部：all
  **/
 
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @RestController
 @RequestMapping("/admin/user/")
 public class AdminUserController extends AdminBaseController {
@@ -72,21 +74,21 @@ public class AdminUserController extends AdminBaseController {
     }
 
     @PostMapping("/detail")
-    @EnableLog(logName = "管理员详情")
+    @EnableLog(logName = "用户详情")
     public BaseResponse detail(@RequestBody UserVO param) {
         User user = adminUserService.getById(param.getUserId());
         return BaseResponse.createSuccessResponse(user);
     }
 
     @PostMapping("/remove")
-    @EnableLog(logName = "删除管理员")
+    @EnableLog(logName = "删除用户")
     public BaseResponse remove(@RequestBody UserVO param) {
         boolean remove = adminUserService.removeById(param.getUserId());
         return BaseResponse.createSuccessOrFailResponse(remove, "删除失败");
     }
 
     @PostMapping("/list")
-    @EnableLog(logName = "管理员列表")
+    @EnableLog(logName = "用户列表")
     public BaseResponse list(@RequestBody UserVO param) {
         // 分页应该有默认值
         long pageNo = param.getPageNo() == null ? 1 : param.getPageNo();

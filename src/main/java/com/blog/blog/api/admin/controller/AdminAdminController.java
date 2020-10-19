@@ -1,12 +1,13 @@
 package com.blog.blog.api.admin.controller;
 
+import com.blog.blog.annotation.EnableLog;
+import com.blog.blog.annotation.IgnoreLog;
 import com.blog.blog.bean.admin.po.Admin;
 import com.blog.blog.bean.admin.vo.AdminVO;
 import com.blog.blog.bean.common.BaseResponse;
-import com.blog.blog.utils.JwtTokenUtils;
-import com.blog.blog.annotation.EnableLog;
-import com.blog.blog.annotation.IgnoreLog;
 import com.blog.blog.security.token.JwtAuthenticationToken;
+import com.blog.blog.utils.JwtTokenUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Li Yao Bing*/
+ * @author Li Yao Bing
+ */
 @RestController
 @RequestMapping("/admin/admin/")
 public class AdminAdminController extends AdminBaseController {
