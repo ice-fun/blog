@@ -44,15 +44,16 @@ public class UserUserService extends ServiceImpl<UserUserMapper, User> implement
 
     @Override
     public AuthUserDetails loadUserByOpenId(String unionId, String openId) throws UsernameNotFoundException {
-        User user = getOne(new LambdaQueryWrapper<User>().eq(User::getMiniProgramOpenId, openId));
-        if (user == null) {
-            user = new User();
-            user.setRole(PropertyConfig.ROLE_VISITOR);
-            user.setIsLock(0);
-            user.setUnionId(unionId);
-            user.setMiniProgramOpenId(openId);
-        }
-        return user;
+//        User user = getOne(new LambdaQueryWrapper<User>().eq(User::getMiniProgramOpenId, openId));
+//        if (user == null) {
+//            user = new User();
+//            user.setRole(PropertyConfig.ROLE_VISITOR);
+//            user.setIsLock(0);
+//            user.setUnionId(unionId);
+//            user.setMiniProgramOpenId(openId);
+//        }
+//        return user;
+        return null;
     }
 
     @Override

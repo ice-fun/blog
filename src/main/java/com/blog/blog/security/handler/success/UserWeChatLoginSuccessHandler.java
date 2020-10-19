@@ -42,8 +42,8 @@ public class UserWeChatLoginSuccessHandler extends AbstractLoginSuccessHandler {
         Map<String, Object> data = new HashMap<>();
         if (user.getUsername() == null) {
             redisUtils.set(weChatAuthenticationToken.getCode() + "_unionId", user.getUnionId(), 300);
-            redisUtils.set(weChatAuthenticationToken.getCode() + "_subOpenId", user.getOfficialOpenId(), 300);
-            redisUtils.set(weChatAuthenticationToken.getCode() + "_avatar", user.getUserAvatar(), 300);
+//            redisUtils.set(weChatAuthenticationToken.getCode() + "_subOpenId", user.getOfficialOpenId(), 300);
+//            redisUtils.set(weChatAuthenticationToken.getCode() + "_avatar", user.getUserAvatar(), 300);
             data.put("code", weChatAuthenticationToken.getCode());
             sendResponse(httpServletResponse, 201, "请绑定手机号码", data);
             return null;

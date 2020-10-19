@@ -50,7 +50,7 @@ public class UserMiniProgramLoginSuccessHandler extends AbstractLoginSuccessHand
         }
         if (parent.getUsername() == null) {
             redisUtils.set(miniProgramAuthenticationToken.getCode() + "_unionId", parent.getUnionId(), 300);
-            redisUtils.set(miniProgramAuthenticationToken.getCode() + "_openId", parent.getMiniProgramOpenId(), 300);
+//            redisUtils.set(miniProgramAuthenticationToken.getCode() + "_openId", parent.getMiniProgramOpenId(), 300);
             redisUtils.set(miniProgramAuthenticationToken.getCode() + "_avatar", avatarUrl, 300);
             data.put("code", miniProgramAuthenticationToken.getCode());
             sendResponse(httpServletResponse, 201, "请绑定手机号码", data);
@@ -58,14 +58,14 @@ public class UserMiniProgramLoginSuccessHandler extends AbstractLoginSuccessHand
         }
         Map<String, Object> claims = new HashMap<>();
         parent.setTokenVersion(parent.getTokenVersion() + 1);
-        if (StringUtils.isBlank(parent.getUnionId())) {
-            parent.setUnionId(wechatResponse.getUnionId());
-            UnbindSubscribeUser user = unbindSubscribeUserService.getOne(new LambdaQueryWrapper<UnbindSubscribeUser>().eq(UnbindSubscribeUser::getUnbindSubscribeUserUnionId, wechatResponse.getUnionId()));
-            if (user != null) {
-                parent.setOfficialOpenId(user.getUnbindSubscribeUserOpenId());
-                parent.setIsSubscribe(PropertyConfig.TRUE);
-            }
-        }
+//        if (StringUtils.isBlank(parent.getUnionId())) {
+//            parent.setUnionId(wechatResponse.getUnionId());
+//            UnbindSubscribeUser user = unbindSubscribeUserService.getOne(new LambdaQueryWrapper<UnbindSubscribeUser>().eq(UnbindSubscribeUser::getUnbindSubscribeUserUnionId, wechatResponse.getUnionId()));
+//            if (user != null) {
+//                parent.setOfficialOpenId(user.getUnbindSubscribeUserOpenId());
+//                parent.setIsSubscribe(PropertyConfig.TRUE);
+//            }
+//        }
         parentService.updateById(parent);
         claims.put("tokenVersion", parent.getTokenVersion());
         String token = JwtTokenUtils.generateToken(claims, parent.getUsername());

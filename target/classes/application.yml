@@ -1,0 +1,51 @@
+spring:
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 1000MB
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  datasource:
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      connection-timeout: 30000
+      pool-name: DatebookHikariCP
+      max-lifetime: 30000
+      idle-timeout: 30000
+      connection-test-query: select 1
+
+server:
+  tomcat:
+    max-http-form-post-size: -1
+  port: 10086
+  servlet:
+    context-path: /blog
+mybatis-plus:
+  type-aliases-package: com.blog.blog.bean.*
+  global-config:
+    db-config:
+      id-type: id_worker_str
+      # 全局配置逻辑删除字段，应该使用bean的属性，而非sql列名
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      table-prefix: blog_tb_
+      table-underline: true
+  configuration:
+    map-underscore-to-camel-case: true
+    #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/*/*.xml
+jwt:
+  secret: secret
+  expiration: 604800000 #七天
+  token: token
+  SECRET: secret
+  EXPIRATION: 604800000
+  TOKEN: token

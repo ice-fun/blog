@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    # 生产环境配置
+    url: jdbc:mysql://127.0.0.1:3306/pro?serverTimezone=GMT%2B8
+    username: pro
+    password: pro
+    #    schema: classpath:db/schema.sql
+    #    data: classpath:db/data.sql
+    initialization-mode: never
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    jedis:
+      pool:
+        max-wait: 30000ms
+        max-active: 100
+        max-idle: 20
+        min-idle: 0
+    timeout: 10000ms
+
+wx:
+  certPath: /www/wwwroot/pro.blog.com/cert/
+  payNoticePath: https://pro.blog.com/blog/WXPay/payNotify
+  refundPath: https://pro.blog.com/blog/WXPay/refundNotify

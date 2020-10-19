@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.blog.blog.security.AuthUserDetails;
 import lombok.Data;
@@ -25,22 +26,14 @@ public class User implements AuthUserDetails {
 
     @TableId
     private String userId;
+    private String userNickname;
     private String userRealName;
-    private String userAvatar;
     private String userPhone;
+    private String userAccount;
+    @JsonIgnore
     private String userPassword;
-    private String childId;
     private String role;
     private Integer tokenVersion;
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private String miniProgramOpenId;
-    private Integer isSubscribe;
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private String officialOpenId;
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private String unionId;
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
-    private Integer isLogin;//0为未登录，1为已登录
     private Integer isLock;//0为未锁定，1为已锁定
     @TableField(value = "is_delete", fill = FieldFill.INSERT)
     private Integer isDelete;//0为未删除，1为已删除
@@ -102,7 +95,7 @@ public class User implements AuthUserDetails {
 
     @Override
     public String getUnionId() {
-        return unionId;
+        return null;
     }
 
     @Override

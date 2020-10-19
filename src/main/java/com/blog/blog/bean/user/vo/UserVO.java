@@ -15,19 +15,13 @@ public class UserVO {
 
     @TableId
     private String userId;
+    private String userNickname;
     private String userRealName;
-    private String userAvatar;
     private String userPhone;
     private String userPassword;
     private String role;
     @JsonIgnore
     private Integer tokenVersion;
-    private String miniProgramOpenId; // 小程序openId
-    private Integer isSubscribe; // 是否关注公众号
-    private String officialOpenId; // 公众号openId
-    @JsonIgnore
-    private String unionId; // unionId
-    private Integer isLogin;//0为未登录，1为已登录
     private Integer isLock;//0为未锁定，1为已锁定
     private Integer isDelete;//0为未删除，1为已删除
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

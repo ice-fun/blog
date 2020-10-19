@@ -33,64 +33,64 @@ public class CustomerCustomerController extends CustomerBaseController {
     }
 
 
-    @PostMapping("/bindPhoneNumber")
-    @EnableLog(logName = "教师 绑定手机")
-    public BaseResponse bindPhoneNumber(@RequestBody CustomerVO customerVO) {
-        String code = customerVO.getCode();
-        String verifyCode = customerVO.getVerifyCode();
-        String phoneNumber = customerVO.getCustomerPhone();
-        Customer customer = customerCustomerService.getOne(new LambdaQueryWrapper<Customer>().eq(Customer::getCustomerPhone, phoneNumber));
-        if (customer == null) {
-            return BaseResponse.createFailResponse("请先联系管理员添加账号");
-        }
-        String vcKey = customer.getCustomerId() + "_vc";
-        if (!verifyCode.equals("000000")) {
-            String verifyCodeInRedis = (String) redisUtils.get(vcKey);
-            if (verifyCodeInRedis == null) {
-                return BaseResponse.createFailResponse("验证码无效");
-            }
-            if (!verifyCodeInRedis.equals(verifyCode)) {
-                return BaseResponse.createFailResponse("验证码不正确");
-            }
-        }
-        String unionId = (String) redisUtils.get(code + "_unionId");
-        String openId = (String) redisUtils.get(code + "_openId");
-        if (unionId == null && openId == null) {
-            return BaseResponse.createFailResponse("绑定失败，请重试");
-        }
-        redisUtils.del(vcKey);
-        redisUtils.del(code);
-        customer.setUnionId(unionId);
-        customer.setMiniProgramOpenId(openId);
-        customer.setTokenVersion(customer.getTokenVersion() + 1);
-        customer.setIsLogin(PropertyConfig.TRUE);
-        // 先将关注公众号信息置空
-        customer.setOfficialOpenId(null);
-        customer.setIsSubscribe(PropertyConfig.FALSE);
-
-        UnbindSubscribeUser unbindSubscribeUser = unbindSubscribeUserService.getOne(new LambdaQueryWrapper<UnbindSubscribeUser>()
-                .eq(UnbindSubscribeUser::getUnbindSubscribeUserUnionId, unionId));
-        //如果之前曾经关注过公众号就绑定一起
-        if (unbindSubscribeUser != null) {
-            customer.setOfficialOpenId(unbindSubscribeUser.getUnbindSubscribeUserOpenId());
-            customer.setIsSubscribe(PropertyConfig.TRUE);
-            //同一微信下 家长端也绑定
-            customerUserService.lambdaUpdate()
-                    .set(User::getOfficialOpenId, unbindSubscribeUser.getUnbindSubscribeUserOpenId())
-                    .set(User::getIsSubscribe, PropertyConfig.TRUE)
-                    .eq(User::getUnionId, unbindSubscribeUser.getUnbindSubscribeUserUnionId()).update();
-        }
-        boolean update = customerCustomerService.updateById(customer);
-        if (!update) {
-            return BaseResponse.createFailResponse("登录失败");
-        }
-        CustomerVO data = WrappedBeanCopier.copyProperties(customer, CustomerVO.class);
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("tokenVersion", customer.getTokenVersion());
-        String token = JwtTokenUtils.generateToken(claims, customer.getUsername());
-        data.setToken(token);
-        return BaseResponse.createSuccessResponse(data);
-    }
+//    @PostMapping("/bindPhoneNumber")
+//    @EnableLog(logName = "教师 绑定手机")
+//    public BaseResponse bindPhoneNumber(@RequestBody CustomerVO customerVO) {
+//        String code = customerVO.getCode();
+//        String verifyCode = customerVO.getVerifyCode();
+//        String phoneNumber = customerVO.getCustomerPhone();
+//        Customer customer = customerCustomerService.getOne(new LambdaQueryWrapper<Customer>().eq(Customer::getCustomerPhone, phoneNumber));
+//        if (customer == null) {
+//            return BaseResponse.createFailResponse("请先联系管理员添加账号");
+//        }
+//        String vcKey = customer.getCustomerId() + "_vc";
+//        if (!verifyCode.equals("000000")) {
+//            String verifyCodeInRedis = (String) redisUtils.get(vcKey);
+//            if (verifyCodeInRedis == null) {
+//                return BaseResponse.createFailResponse("验证码无效");
+//            }
+//            if (!verifyCodeInRedis.equals(verifyCode)) {
+//                return BaseResponse.createFailResponse("验证码不正确");
+//            }
+//        }
+//        String unionId = (String) redisUtils.get(code + "_unionId");
+//        String openId = (String) redisUtils.get(code + "_openId");
+//        if (unionId == null && openId == null) {
+//            return BaseResponse.createFailResponse("绑定失败，请重试");
+//        }
+//        redisUtils.del(vcKey);
+//        redisUtils.del(code);
+//        customer.setUnionId(unionId);
+//        customer.setMiniProgramOpenId(openId);
+//        customer.setTokenVersion(customer.getTokenVersion() + 1);
+//        customer.setIsLogin(PropertyConfig.TRUE);
+//        // 先将关注公众号信息置空
+//        customer.setOfficialOpenId(null);
+//        customer.setIsSubscribe(PropertyConfig.FALSE);
+//
+//        UnbindSubscribeUser unbindSubscribeUser = unbindSubscribeUserService.getOne(new LambdaQueryWrapper<UnbindSubscribeUser>()
+//                .eq(UnbindSubscribeUser::getUnbindSubscribeUserUnionId, unionId));
+//        //如果之前曾经关注过公众号就绑定一起
+//        if (unbindSubscribeUser != null) {
+//            customer.setOfficialOpenId(unbindSubscribeUser.getUnbindSubscribeUserOpenId());
+//            customer.setIsSubscribe(PropertyConfig.TRUE);
+//            //同一微信下 家长端也绑定
+//            customerUserService.lambdaUpdate()
+//                    .set(User::getOfficialOpenId, unbindSubscribeUser.getUnbindSubscribeUserOpenId())
+//                    .set(User::getIsSubscribe, PropertyConfig.TRUE)
+//                    .eq(User::getUnionId, unbindSubscribeUser.getUnbindSubscribeUserUnionId()).update();
+//        }
+//        boolean update = customerCustomerService.updateById(customer);
+//        if (!update) {
+//            return BaseResponse.createFailResponse("登录失败");
+//        }
+//        CustomerVO data = WrappedBeanCopier.copyProperties(customer, CustomerVO.class);
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("tokenVersion", customer.getTokenVersion());
+//        String token = JwtTokenUtils.generateToken(claims, customer.getUsername());
+//        data.setToken(token);
+//        return BaseResponse.createSuccessResponse(data);
+//    }
 
     @PostMapping("/verifyCode")
     public BaseResponse verifyCode(@RequestBody CustomerVO customerVO) {

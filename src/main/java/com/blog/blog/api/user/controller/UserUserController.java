@@ -50,62 +50,62 @@ public class UserUserController extends UserBaseController {
         return BaseResponse.createSuccessResponse(userVO);
     }
 
-    @PostMapping("/bindPhoneNumber")
-    public BaseResponse bindPhoneNumber(@RequestBody UserVO userVo) {
-        String code = userVo.getCode();
-        String verifyCode = userVo.getVerifyCode();
-        String phoneNumber = userVo.getUserPhone();
-        User user = userUserService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserPhone, phoneNumber));
-        if (user == null) {
-            return BaseResponse.createFailResponse("请先联系老师添加账号");
-        }
-        String vcKey = user.getUserId() + "_vc";
-
-        String verifyCodeInRedis = (String) redisUtils.get(vcKey);
-        if (verifyCodeInRedis == null) {
-            return BaseResponse.createFailResponse("验证码无效");
-        }
-        if (!verifyCodeInRedis.equals(verifyCode)) {
-            return BaseResponse.createFailResponse("验证码不正确");
-        }
-
-        String unionId = (String) redisUtils.get(code + "_unionId");
-        String openId = (String) redisUtils.get(code + "_openId");
-        if (unionId == null && openId == null) {
-            return BaseResponse.createFailResponse("绑定失败，请重试");
-        }
-        redisUtils.del(vcKey);
-        redisUtils.del(code);
-        user.setUnionId(unionId);
-        user.setMiniProgramOpenId(openId);
-        // 先将关注公众号信息置空
-        user.setOfficialOpenId(null);
-        user.setIsSubscribe(PropertyConfig.FALSE);
-
-        user.setTokenVersion(user.getTokenVersion() + 1);
-        UnbindSubscribeUser unbindSubscribeUser = unbindSubscribeUserService.getOne(new LambdaQueryWrapper<UnbindSubscribeUser>()
-                .eq(UnbindSubscribeUser::getUnbindSubscribeUserUnionId, unionId));
-        //如果之前曾经关注过公众号就绑定一起
-        if (unbindSubscribeUser != null) {
-            user.setOfficialOpenId(unbindSubscribeUser.getUnbindSubscribeUserOpenId());
-            user.setIsSubscribe(PropertyConfig.TRUE);
-            userCustomerService.lambdaUpdate()
-                    .set(Customer::getOfficialOpenId, unbindSubscribeUser.getUnbindSubscribeUserOpenId())
-                    .set(Customer::getIsSubscribe, PropertyConfig.TRUE)
-                    .eq(Customer::getUnionId, unionId).update();
-        }
-        user.setIsLogin(PropertyConfig.TRUE);
-        boolean update = userUserService.updateById(user);
-        if (!update) {
-            return BaseResponse.createFailResponse("登录失败");
-        }
-        UserVO data = WrappedBeanCopier.copyProperties(user, UserVO.class);
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("tokenVersion", user.getTokenVersion());
-        String token = JwtTokenUtils.generateToken(claims, user.getUsername());
-        data.setToken(token);
-        return BaseResponse.createSuccessResponse(data);
-    }
+//    @PostMapping("/bindPhoneNumber")
+//    public BaseResponse bindPhoneNumber(@RequestBody UserVO userVo) {
+//        String code = userVo.getCode();
+//        String verifyCode = userVo.getVerifyCode();
+//        String phoneNumber = userVo.getUserPhone();
+//        User user = userUserService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserPhone, phoneNumber));
+//        if (user == null) {
+//            return BaseResponse.createFailResponse("请先联系老师添加账号");
+//        }
+//        String vcKey = user.getUserId() + "_vc";
+//
+//        String verifyCodeInRedis = (String) redisUtils.get(vcKey);
+//        if (verifyCodeInRedis == null) {
+//            return BaseResponse.createFailResponse("验证码无效");
+//        }
+//        if (!verifyCodeInRedis.equals(verifyCode)) {
+//            return BaseResponse.createFailResponse("验证码不正确");
+//        }
+//
+//        String unionId = (String) redisUtils.get(code + "_unionId");
+//        String openId = (String) redisUtils.get(code + "_openId");
+//        if (unionId == null && openId == null) {
+//            return BaseResponse.createFailResponse("绑定失败，请重试");
+//        }
+//        redisUtils.del(vcKey);
+//        redisUtils.del(code);
+//        user.setUnionId(unionId);
+//        user.setMiniProgramOpenId(openId);
+//        // 先将关注公众号信息置空
+//        user.setOfficialOpenId(null);
+//        user.setIsSubscribe(PropertyConfig.FALSE);
+//
+//        user.setTokenVersion(user.getTokenVersion() + 1);
+//        UnbindSubscribeUser unbindSubscribeUser = unbindSubscribeUserService.getOne(new LambdaQueryWrapper<UnbindSubscribeUser>()
+//                .eq(UnbindSubscribeUser::getUnbindSubscribeUserUnionId, unionId));
+//        //如果之前曾经关注过公众号就绑定一起
+//        if (unbindSubscribeUser != null) {
+//            user.setOfficialOpenId(unbindSubscribeUser.getUnbindSubscribeUserOpenId());
+//            user.setIsSubscribe(PropertyConfig.TRUE);
+//            userCustomerService.lambdaUpdate()
+//                    .set(Customer::getOfficialOpenId, unbindSubscribeUser.getUnbindSubscribeUserOpenId())
+//                    .set(Customer::getIsSubscribe, PropertyConfig.TRUE)
+//                    .eq(Customer::getUnionId, unionId).update();
+//        }
+//        user.setIsLogin(PropertyConfig.TRUE);
+//        boolean update = userUserService.updateById(user);
+//        if (!update) {
+//            return BaseResponse.createFailResponse("登录失败");
+//        }
+//        UserVO data = WrappedBeanCopier.copyProperties(user, UserVO.class);
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("tokenVersion", user.getTokenVersion());
+//        String token = JwtTokenUtils.generateToken(claims, user.getUsername());
+//        data.setToken(token);
+//        return BaseResponse.createSuccessResponse(data);
+//    }
 
     @PostMapping("/verifyCode")
     public BaseResponse verifyCode(@RequestBody UserVO userVo) {
@@ -170,13 +170,13 @@ public class UserUserController extends UserBaseController {
     }
 
 
-    @PostMapping("/unbind")
-    public BaseResponse unbind(@AuthenticationPrincipal User user) {
-        user.setIsSubscribe(0);
-        user.setOfficialOpenId(null);
-        user.setUnionId(null);
-        user.setMiniProgramOpenId(null);
-        boolean update = userUserService.updateById(user);
-        return BaseResponse.createSuccessOrFailResponse(update, "解绑失败");
-    }
+//    @PostMapping("/unbind")
+//    public BaseResponse unbind(@AuthenticationPrincipal User user) {
+//        user.setIsSubscribe(0);
+//        user.setOfficialOpenId(null);
+//        user.setUnionId(null);
+//        user.setMiniProgramOpenId(null);
+//        boolean update = userUserService.updateById(user);
+//        return BaseResponse.createSuccessOrFailResponse(update, "解绑失败");
+//    }
 }
