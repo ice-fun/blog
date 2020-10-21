@@ -3,13 +3,12 @@ package com.blog.blog.bean.user.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.blog.blog.security.AuthUserDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.blog.blog.security.AuthUserDetails;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,7 +25,7 @@ public class User implements AuthUserDetails {
 
     @TableId
     private String userId;
-    private String userNickname;
+    private String userNickName;
     private String userRealName;
     private String userPhone;
     private String userAccount;
@@ -53,12 +52,12 @@ public class User implements AuthUserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return userPassword;
     }
 
     @Override
     public String getUsername() {
-        return userId;
+        return userAccount;
     }
 
     @Override

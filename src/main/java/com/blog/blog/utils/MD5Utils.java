@@ -1,6 +1,7 @@
 package com.blog.blog.utils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -16,11 +17,9 @@ public class MD5Utils {
     public static String md5Decode32(String content) {
         byte[] hash;
         try {
-            hash = MessageDigest.getInstance("MD5").digest(content.getBytes("UTF-8"));
+            hash = MessageDigest.getInstance("MD5").digest(content.getBytes(StandardCharsets.UTF_8));
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("NoSuchAlgorithmException", e);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("UnsupportedEncodingException", e);
         }
         StringBuilder hex = new StringBuilder(hash.length * 2);
         for (byte b : hash) {

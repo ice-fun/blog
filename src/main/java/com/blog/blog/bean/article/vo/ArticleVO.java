@@ -1,6 +1,6 @@
-package com.blog.blog.bean.Article.vo;
+package com.blog.blog.bean.article.vo;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.alibaba.fastjson.annotation.JSONField;
@@ -42,18 +42,18 @@ public class ArticleVO {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @TableField(value = "article_publish_time", fill = FieldFill.INSERT)
-	private Date articlePublishTime;//发布时间
+	private LocalDateTime articlePublishTime;//发布时间
 	
 	@TableField(value = "is_delete", fill = FieldFill.INSERT)
-	private int isDelete;
+	private Integer isDelete;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
-	private Date createTime;
+	private LocalDateTime createTime;
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @TableField(value = "update_time", fill = FieldFill.INSERT)
-	private Date updateTime;
+	private LocalDateTime updateTime;
 }
