@@ -26,7 +26,7 @@ public class User implements AuthUserDetails {
 
     @TableId
     private String userId;
-    private String userNickname;
+    private String userNickName;
     private String userRealName;
     private String userPhone;
     private String userAccount;
@@ -53,12 +53,12 @@ public class User implements AuthUserDetails {
 
     @Override
     public String getPassword() {
-        return null;
+        return userPassword;
     }
 
     @Override
     public String getUsername() {
-        return userId;
+        return userAccount;
     }
 
     @Override

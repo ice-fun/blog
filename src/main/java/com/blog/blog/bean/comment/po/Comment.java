@@ -12,6 +12,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Data;
 
+/**
+ * @description: 评论实体类
+ * @updateTime: 2020-10-21
+ * @author xuguoxing
+ * */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @TableName(autoResultMap = true) // mybatisPlus 自动映射JSON类型的sql列

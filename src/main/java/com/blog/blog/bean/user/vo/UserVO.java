@@ -15,7 +15,7 @@ public class UserVO {
 
     @TableId
     private String userId;
-    private String userNickname;
+    private String userNickName;
     private String userRealName;
     private String userPhone;
     private String userPassword;

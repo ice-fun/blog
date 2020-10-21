@@ -3,6 +3,7 @@ package com.blog.blog.api.user.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.blog.api.user.mapper.UserUserMapper;
+import com.blog.blog.bean.admin.po.Admin;
 import com.blog.blog.bean.user.po.User;
 import com.blog.blog.config.PropertyConfig;
 import com.blog.blog.security.AuthUserDetails;
@@ -21,7 +22,7 @@ public class UserUserService extends ServiceImpl<UserUserMapper, User> implement
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        User user = getById(s);
+        User user = getOne(new LambdaQueryWrapper<User>().eq(User::getUserAccount, s));
         if (user == null) {
             throw new UsernameNotFoundException("无效的登录信息");
         }
