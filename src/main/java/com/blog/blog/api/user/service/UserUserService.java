@@ -3,7 +3,6 @@ package com.blog.blog.api.user.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.blog.blog.api.user.mapper.UserUserMapper;
-import com.blog.blog.bean.admin.po.Admin;
 import com.blog.blog.bean.user.po.User;
 import com.blog.blog.config.PropertyConfig;
 import com.blog.blog.security.AuthUserDetails;

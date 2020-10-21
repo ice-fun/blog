@@ -1,7 +1,7 @@
 package com.blog.blog;
 
 import com.blog.blog.api.admin.service.AdminAdminService;
-import com.blog.blog.api.admin.service.AdminUserService;
+import com.blog.blog.api.user.service.UserUserService;
 import com.blog.blog.bean.admin.po.Admin;
 import com.blog.blog.bean.user.po.User;
 import com.blog.blog.config.PropertyConfig;
@@ -22,8 +22,9 @@ class BootApplicationTests {
     @Resource
     AdminAdminService adminService;
 
+
     @Resource
-    AdminUserService userService;
+    UserUserService userService;
 
     @Resource
     BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -40,7 +41,7 @@ class BootApplicationTests {
     }
 
     @Test
-    void addUser(){
+    void saveUser(){
         User user = new User();
         user.setUserNickName("hades");
         String defaultPassword = PropertyConfig.DEFAULT_PASSWORD;
@@ -52,4 +53,13 @@ class BootApplicationTests {
         System.out.println(save);
     }
 
+
+    @Test
+    void addUser(){
+        User user = new User();
+        user.setUserAccount("test");
+        user.setUserPassword(bCryptPasswordEncoder.encode(MD5Utils.md5Decode32WithSalt("11111111")));
+        boolean save = userService.save(user);
+        System.out.println(save);
+    }
 }
