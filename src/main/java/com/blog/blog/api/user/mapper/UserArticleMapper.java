@@ -8,6 +8,6 @@ import com.blog.blog.bean.article.po.Article;
  * @author xuguoxing
  * @updateTime 2020-10-21
  */
-public interface ArticleMapper extends BaseMapper<Article>{
+public interface UserArticleMapper extends BaseMapper<Article>{
 
 }

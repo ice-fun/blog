@@ -56,4 +56,9 @@ public class ArticleVO {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @TableField(value = "update_time", fill = FieldFill.INSERT)
 	private LocalDateTime updateTime;
+	
+	
+    private String keyword;
+    private Long pageNo;
+    private Long pageSize;
 }
