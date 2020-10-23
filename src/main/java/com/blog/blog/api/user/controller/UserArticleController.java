@@ -37,8 +37,8 @@ public class UserArticleController extends UserBaseController{
 
 	@PostMapping("/modify")
 	@EnableLog(logName = "修改文章")
-	public BaseResponse<Article> modify(@RequestBody ArticleVO articleVO) {
-		Article article = userArticleService.getById(articleVO.getArticleId());
+	public BaseResponse<Article> modify(@RequestBody ArticleVO param) {
+		Article article = userArticleService.getById(param.getArticleId());
 		// 必须进行判空操作，尽力避免空指针
         Assert.notNull(article, "数据不存在");
 
