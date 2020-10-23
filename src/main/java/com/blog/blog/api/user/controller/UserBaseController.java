@@ -2,6 +2,7 @@ package com.blog.blog.api.user.controller;
 
 import com.blog.blog.api.system.service.SystemLogService;
 import com.blog.blog.api.system.service.UnbindSubscribeUserService;
+import com.blog.blog.api.user.service.UserArticleService;
 import com.blog.blog.api.user.service.UserCustomerService;
 import com.blog.blog.task.AsyncTask;
 import com.blog.blog.utils.RedisUtils;
@@ -16,20 +17,23 @@ import javax.annotation.Resource;
 public abstract class UserBaseController {
 
     @Resource
-    UnbindSubscribeUserService unbindSubscribeUserService;
+    protected UnbindSubscribeUserService unbindSubscribeUserService;
 
     @Resource
-    SystemLogService systemLogService;
+    protected SystemLogService systemLogService;
 
     @Resource
-    UserUserService userUserService;
+    protected UserUserService userUserService;
 
     @Resource
-    RedisUtils redisUtils;
+    protected RedisUtils redisUtils;
 
     @Resource
-    AsyncTask asyncTask;
+    protected AsyncTask asyncTask;
 
     @Resource
-    UserCustomerService userCustomerService;
+    protected UserCustomerService userCustomerService;
+
+    @Resource
+    protected UserArticleService userArticleService;
 }

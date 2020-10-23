@@ -1,6 +1,7 @@
 package com.blog.blog.security.filter;
 
 import com.blog.blog.security.token.JwtAuthenticationToken;
+import com.blog.blog.security.token.UserJwtAuthenticationToken;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,6 +38,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private AuthenticationSuccessHandler successHandler;
     @Setter
     private AuthenticationFailureHandler failureHandler;
+
+    /**
+     * 允许token为空的路径，针对本博客系统，允许用户不登录(访客)的情况下访问某些地址，比如文章列表、详情
+     */
+    private final List<RequestMatcher> allowVisitorRequestMatchers = new ArrayList<>(
+            Arrays.asList(new AntPathRequestMatcher("/user/article/list"), new AntPathRequestMatcher("/user/article/detail"))
+    );
 
 
     public JwtAuthenticationFilter(String path, Class<? extends JwtAuthenticationToken> auth) {
@@ -62,19 +71,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         Authentication authResult = null;
         AuthenticationException failed = null;
-        try {
-            String token = getJwtToken(request);
-            JwtAuthenticationToken jwtAuthenticationToken = auth.getConstructor(String.class).newInstance(token);
-            authResult = authenticationManager.authenticate(jwtAuthenticationToken);
-        } catch (AuthenticationException e) {
-            failed = e;
-        }// Authentication failed
-
-        if (authResult != null) {
+        String token = getJwtToken(request);
+        if (this.allowVisitorRequest(request) && StringUtils.isBlank(token)) {
+            authResult = new UserJwtAuthenticationToken(true);
             successfulAuthentication(request, response, filterChain, authResult);
         } else {
-            unsuccessfulAuthentication(request, response, failed);
-            return;
+            try {
+                JwtAuthenticationToken jwtAuthenticationToken = auth.getConstructor(String.class).newInstance(token);
+                authResult = authenticationManager.authenticate(jwtAuthenticationToken);
+            } catch (AuthenticationException e) {
+                failed = e;
+            }// Authentication failed
+
+            if (authResult != null) {
+                successfulAuthentication(request, response, filterChain, authResult);
+            } else {
+                unsuccessfulAuthentication(request, response, failed);
+                return;
+            }
         }
         filterChain.doFilter(request, response);
     }
@@ -121,5 +135,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         for (String url : urls) {
             permissiveRequestMatchers.add(new AntPathRequestMatcher(url));
         }
+    }
+
+    public boolean allowVisitorRequest(HttpServletRequest request) {
+        return allowVisitorRequestMatchers.stream().anyMatch(visitorMatcher -> visitorMatcher.matches(request));
     }
 }
