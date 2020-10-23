@@ -11,10 +11,6 @@ public class UserJwtAuthenticationToken extends JwtAuthenticationToken {
         super(token);
     }
 
-    public UserJwtAuthenticationToken(Boolean visitor) {
-        super(visitor);
-    }
-
     public UserJwtAuthenticationToken(AuthUserDetails principal, String token, Collection<? extends GrantedAuthority> authorities) {
         super(principal, token, authorities);
     }

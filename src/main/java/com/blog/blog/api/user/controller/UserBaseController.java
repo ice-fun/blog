@@ -18,23 +18,23 @@ import javax.annotation.Resource;
 public abstract class UserBaseController {
 
     @Resource
-    protected UnbindSubscribeUserService unbindSubscribeUserService;
+    UnbindSubscribeUserService unbindSubscribeUserService;
 
     @Resource
-    protected SystemLogService systemLogService;
+    SystemLogService systemLogService;
 
     @Resource
-    protected UserUserService userUserService;
+    UserUserService userUserService;
 
     @Resource
-    protected RedisUtils redisUtils;
+    RedisUtils redisUtils;
 
     @Resource
-    protected AsyncTask asyncTask;
+    AsyncTask asyncTask;
 
     @Resource
-    protected UserCustomerService userCustomerService;
-
+    UserCustomerService userCustomerService;
+    
     @Resource
     protected UserArticleService userArticleService;
 

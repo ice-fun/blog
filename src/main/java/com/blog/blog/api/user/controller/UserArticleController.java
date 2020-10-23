@@ -1,43 +1,45 @@
 package com.blog.blog.api.user.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.blog.blog.annotation.EnableLog;
-import com.blog.blog.bean.article.po.Article;
-import com.blog.blog.bean.article.vo.ArticleVO;
-import com.blog.blog.bean.common.BaseResponse;
-import com.blog.blog.bean.user.po.User;
-import com.blog.blog.utils.WrappedBeanCopier;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.blog.blog.annotation.EnableLog;
+import com.blog.blog.bean.article.po.Article;
+import com.blog.blog.bean.article.vo.ArticleVO;
+import com.blog.blog.bean.common.BaseResponse;
+import com.blog.blog.utils.WrappedBeanCopier;
+
+
 /**
+ * @description 用户文章模块
  * @author xuguoxing
  * @description 用户文章模块
  * @updateTime 2020-10-21
  */
 @RestController
 @RequestMapping("/user/article")
-public class UserArticleController extends UserBaseController {
+public class UserArticleController extends UserBaseController{
 
-    @PostMapping("/save")
-    @EnableLog(logName = "添加文章")
-    public BaseResponse<Article> save(@RequestBody ArticleVO param) {
-        Article article = WrappedBeanCopier.copyProperties(param, Article.class);
-        if (!userArticleService.saveOrUpdate(article)) {
-            return BaseResponse.createFailResponse("保存失败");
-        }
-        return BaseResponse.createSuccessResponse();
-    }
+	@PostMapping("/save")
+	@EnableLog(logName = "添加文章")
+	public BaseResponse<Article> save(@RequestBody ArticleVO param) {
+		Article article = WrappedBeanCopier.copyProperties(param,Article.class);
+		if(!userArticleService.saveOrUpdate(article)) {
+			return BaseResponse.createFailResponse("保存失败");
+		}
+		return BaseResponse.createSuccessResponse();
+	}
 
-    @PostMapping("/modify")
-    @EnableLog(logName = "修改文章")
-    public BaseResponse<Article> modify(@RequestBody ArticleVO param) {
-        Article article = userArticleService.getById(param.getArticleId());
-        // 必须进行判空操作，尽力避免空指针
+	@PostMapping("/modify")
+	@EnableLog(logName = "修改文章")
+	public BaseResponse<Article> modify(@RequestBody ArticleVO articleVO) {
+		Article article = userArticleService.getById(articleVO.getArticleId());
+		// 必须进行判空操作，尽力避免空指针
         Assert.notNull(article, "数据不存在");
 
         WrappedBeanCopier.copyPropertiesIgnoreNull(param, article);
