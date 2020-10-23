@@ -4,7 +4,7 @@
     <select id="getList" resultType="com.blog.blog.bean.article.vo.ArticleVO">
         select art.*,usr.user_nick_name,count(cmt.comment_id) as comment_count
         from (blog_tb_article art,blog_tb_user usr)
-        left join blog_tb_comment cmt on cmt.target_id = art.article_id
+        left join blog_tb_comment cmt on cmt.target_id = art.article_id and is_delete = 0
         where art.user_id = usr.user_id and art.is_delete = 0
     </select>
 </mapper>
