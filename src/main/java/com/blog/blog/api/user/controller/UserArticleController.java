@@ -50,8 +50,8 @@ public class UserArticleController extends UserBaseController{
 	
 	@PostMapping("/detail")
     @EnableLog(logName = "文章详情")
-    public BaseResponse<Article> detail(@RequestBody ArticleVO articleVO) {
-		Article article = userArticleService.getById(articleVO.getUserId());
+    public BaseResponse<Article> detail(@RequestBody ArticleVO param) {
+        Article article = userArticleService.getById(param.getArticleId());
         return BaseResponse.createSuccessResponse(article);
     }
 	

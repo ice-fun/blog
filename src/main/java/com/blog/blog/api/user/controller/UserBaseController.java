@@ -36,8 +36,8 @@ public abstract class UserBaseController {
     UserCustomerService userCustomerService;
     
     @Resource
-    UserArticleService userArticleService;
-    
+    protected UserArticleService userArticleService;
+
     @Resource
     UserCommentService userCommentService;
 }
