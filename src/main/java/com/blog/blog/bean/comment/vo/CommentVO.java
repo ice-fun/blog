@@ -45,4 +45,7 @@ public class CommentVO {
     @TableField(value = "update_time", fill = FieldFill.INSERT)
 	private LocalDateTime updateTime;
 	
+	private String keyword;
+    private Long pageNo;
+    private Long pageSize;
 }

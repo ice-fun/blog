@@ -14,18 +14,10 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     private String credentials;
     @Getter
     private String token;
-    @Getter
-    private boolean visitor;
 
     public JwtAuthenticationToken(String token) {
         super(Collections.emptyList());
         this.token = token;
-    }
-
-
-    public JwtAuthenticationToken(boolean visitor) {
-        super(Collections.emptyList());
-        this.visitor = visitor;
     }
 
     public JwtAuthenticationToken(AuthUserDetails principal, String token, Collection<? extends GrantedAuthority> authorities) {
