@@ -43,7 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * 允许token为空的路径，针对本博客系统，允许用户不登录(访客)的情况下访问某些地址，比如文章列表、详情
      */
     private final List<RequestMatcher> allowVisitorRequestMatchers = new ArrayList<>(
-            Arrays.asList(new AntPathRequestMatcher("/user/article/list"), new AntPathRequestMatcher("/user/article/detail"))
+            Arrays.asList(
+                    new AntPathRequestMatcher("/user/article/list"),
+                    new AntPathRequestMatcher("/user/article/detail")
+            )
     );
 
 
