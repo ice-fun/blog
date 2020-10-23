@@ -46,7 +46,7 @@ public class SystemLogAspect {
 
     private String[] headerNames = {"token", "content-type"};
 
-    @Pointcut("execution (* com.cqyz.aibeijiayuan.api.*.controller..*.*(..))")
+    @Pointcut("execution (* com.blog.blog.api.*.controller..*.*(..))")
     public void controllerAspect() {
     }
 

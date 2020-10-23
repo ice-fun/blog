@@ -50,7 +50,7 @@ public class AdminUserController extends AdminBaseController {
      * @return 项目统一的结果类。
      */
     @PostMapping("/save")
-    @EnableLog(logName = "添加用户")
+    @EnableLog(logName = "添加用户",logPlatform = "后台")
     public BaseResponse save(@RequestBody UserVO param) {
         User user = WrappedBeanCopier.copyProperties(param, User.class);
         boolean save = adminUserService.save(user);
@@ -62,7 +62,7 @@ public class AdminUserController extends AdminBaseController {
     }
 
     @PostMapping("/modify")
-    @EnableLog(logName = "修改用户信息")
+    @EnableLog(logName = "修改用户信息",logPlatform = "后台")
     public BaseResponse modify(@RequestBody UserVO param) {
         User user = adminUserService.getById(param.getUserId());
         // 必须进行判空操作，尽力避免空指针
@@ -74,21 +74,21 @@ public class AdminUserController extends AdminBaseController {
     }
 
     @PostMapping("/detail")
-    @EnableLog(logName = "用户详情")
+    @EnableLog(logName = "用户详情",logPlatform = "后台")
     public BaseResponse detail(@RequestBody UserVO param) {
         User user = adminUserService.getById(param.getUserId());
         return BaseResponse.createSuccessResponse(user);
     }
 
     @PostMapping("/remove")
-    @EnableLog(logName = "删除用户")
+    @EnableLog(logName = "删除用户",logPlatform = "后台")
     public BaseResponse remove(@RequestBody UserVO param) {
         boolean remove = adminUserService.removeById(param.getUserId());
         return BaseResponse.createSuccessOrFailResponse(remove, "删除失败");
     }
 
     @PostMapping("/list")
-    @EnableLog(logName = "用户列表")
+    @EnableLog(logName = "用户列表",logPlatform = "后台")
     public BaseResponse list(@RequestBody UserVO param) {
         // 分页应该有默认值
         long pageNo = param.getPageNo() == null ? 1 : param.getPageNo();

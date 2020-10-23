@@ -15,5 +15,5 @@ public @interface EnableLog {
 
     String logType() default "";
 
-    String logPlatform() default "管理平台";
+    String logPlatform() default "博客";
 }

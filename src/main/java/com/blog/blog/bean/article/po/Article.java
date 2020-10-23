@@ -39,6 +39,8 @@ public class Article {
 	private String articleTitle;
 	//内容
 	private String articleContent;
+	// 摘要
+	private String articleSummary;
 	//点赞数
 	private Integer likeCount;
 	//阅读数
@@ -48,7 +50,8 @@ public class Article {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     @TableField(value = "article_publish_time", fill = FieldFill.INSERT)
 	private LocalDateTime articlePublishTime;//发布时间
-	
+	private Integer isRecommend;
+
 	@TableField(value = "is_delete", fill = FieldFill.INSERT)
 	private Integer isDelete;
 	

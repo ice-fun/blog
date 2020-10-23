@@ -67,8 +67,8 @@ public class UserArticleController extends UserBaseController {
         // 分页应该有默认值
         long pageNo = param.getPageNo() == null ? 1 : param.getPageNo();
         long pageSize = param.getPageSize() == null ? 10 : param.getPageSize();
-        Page<Article> page = new Page<>(pageNo, pageSize);
-        page = userArticleService.page(page);
+        Page<ArticleVO> page = new Page<>(pageNo, pageSize);
+        page = userArticleService.getBaseMapper().getList(page);
         return BaseResponse.createSuccessResponse(page);
     }
 }
