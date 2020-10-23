@@ -225,11 +225,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         //直接放行 不经security流程
         web.ignoring().antMatchers(
+        		//swagger2不被Security拦截配置代码
+        		"/swagger-ui.html",
+        		"/swagger-ui.html#",
+        		"/swagger-ui.html#/**",
+                "/v2/api-docs", // swagger api json
+                "/swagger-resources/configuration/ui", // 用来获取支持的动作
+                "/swagger-resources", // 用来获取api-docs的URI
+                "/swagger-resources/configuration/security", // 安全选项
+				"/swagger-resources/**",
+				"/webjars/**",
+				
                 "/wechatOfficialAccounts/getMessage",
                 "/*/index/bindPhoneNumber",
                 "/WXPay/*",
                 "/*/index/verifyCode"
 //                ,"/**"
+                
         );
     }
 
