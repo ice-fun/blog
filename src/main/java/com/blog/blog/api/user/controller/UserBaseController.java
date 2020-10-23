@@ -2,6 +2,8 @@ package com.blog.blog.api.user.controller;
 
 import com.blog.blog.api.system.service.SystemLogService;
 import com.blog.blog.api.system.service.UnbindSubscribeUserService;
+import com.blog.blog.api.user.service.UserArticleService;
+import com.blog.blog.api.user.service.UserCommentService;
 import com.blog.blog.api.user.service.UserCustomerService;
 import com.blog.blog.task.AsyncTask;
 import com.blog.blog.utils.RedisUtils;
@@ -32,4 +34,10 @@ public abstract class UserBaseController {
 
     @Resource
     UserCustomerService userCustomerService;
+    
+    @Resource
+    UserArticleService userArticleService;
+    
+    @Resource
+    UserCommentService userCommentService;
 }

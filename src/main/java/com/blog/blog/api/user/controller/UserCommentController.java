@@ -49,7 +49,7 @@ public class UserCommentController extends UserBaseController{
 	@PostMapping("/detail")
     @EnableLog(logName = "评论详情")
     public BaseResponse<Comment> detail(@RequestBody CommentVO commentVO) {
-		Comment comment = userCommentService.getById(commentVO.getUserId());
+		Comment comment = userCommentService.getById(commentVO.getCommentId());
         return BaseResponse.createSuccessResponse(comment);
     }
 	

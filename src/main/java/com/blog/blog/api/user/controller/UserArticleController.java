@@ -10,12 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.blog.blog.annotation.EnableLog;
-import com.blog.blog.api.user.service.UserArticleService;
 import com.blog.blog.bean.article.po.Article;
 import com.blog.blog.bean.article.vo.ArticleVO;
 import com.blog.blog.bean.common.BaseResponse;
-import com.blog.blog.bean.user.po.User;
-import com.blog.blog.bean.user.vo.UserVO;
 import com.blog.blog.utils.WrappedBeanCopier;
 
 /**
@@ -25,16 +22,13 @@ import com.blog.blog.utils.WrappedBeanCopier;
  */
 @RestController
 @RequestMapping("/user/article")
-public class UserArticleController {
-	
-	@Resource
-	private UserArticleService articleService;
+public class UserArticleController extends UserBaseController{
 	
 	@PostMapping("/save")
 	@EnableLog(logName = "添加文章")
 	public BaseResponse<Article> save(@RequestBody ArticleVO articleVO) {
 		Article article = WrappedBeanCopier.copyProperties(articleVO,Article.class);
-		if(!articleService.saveOrUpdate(article)) {
+		if(!userArticleService.saveOrUpdate(article)) {
 			return BaseResponse.createFailResponse("保存失败");
 		}
 		return BaseResponse.createSuccessResponse();
@@ -43,12 +37,12 @@ public class UserArticleController {
 	@PostMapping("/modify")
 	@EnableLog(logName = "修改文章")
 	public BaseResponse<Article> modify(@RequestBody ArticleVO articleVO) {
-		Article article = articleService.getById(articleVO.getArticleId());
+		Article article = userArticleService.getById(articleVO.getArticleId());
 		// 必须进行判空操作，尽力避免空指针
         Assert.notNull(article, "数据不存在");
 
         WrappedBeanCopier.copyPropertiesIgnoreNull(articleVO,article);
-		if(!articleService.updateById(article)) {
+		if(!userArticleService.updateById(article)) {
 			return BaseResponse.createFailResponse("修改失败");
 		}
 		return BaseResponse.createSuccessResponse();
@@ -57,14 +51,14 @@ public class UserArticleController {
 	@PostMapping("/detail")
     @EnableLog(logName = "文章详情")
     public BaseResponse<Article> detail(@RequestBody ArticleVO articleVO) {
-		Article article = articleService.getById(articleVO.getUserId());
+		Article article = userArticleService.getById(articleVO.getUserId());
         return BaseResponse.createSuccessResponse(article);
     }
 	
 	@PostMapping("/remove")
     @EnableLog(logName = "删除文章")
     public BaseResponse<Article> remove(@RequestBody ArticleVO articleVO) {
-        boolean remove = articleService.removeById(articleVO.getArticleId());
+        boolean remove = userArticleService.removeById(articleVO.getArticleId());
         return BaseResponse.createSuccessOrFailResponse(remove, "删除失败");
     }
 	
@@ -75,7 +69,7 @@ public class UserArticleController {
         long pageNo = articleVO.getPageNo() == null ? 1 : articleVO.getPageNo();
         long pageSize = articleVO.getPageSize() == null ? 10 : articleVO.getPageSize();
         Page<Article> page = new Page<>(pageNo, pageSize);
-        page = articleService.page(page);
+        page = userArticleService.page(page);
         return BaseResponse.createSuccessResponse(page);
     }
 }
